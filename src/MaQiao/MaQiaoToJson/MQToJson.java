@@ -42,13 +42,27 @@ public final class MQToJson {
 
 	/**
 	 * 外接对象
-	 * @param obj
+	 * @param obj Object
 	 * @return String
 	 */
-	public static final String toJson(final Object obj) {
+	public static final String toJsonString(final Object obj) {
 		try (Node node = new Node(obj);) {
 			ObjectToJson(node, obj);
 			return node.sb.getString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	/**
+	 * 外接对象
+	 * @param obj Object
+	 * @return  char[]
+	 */
+	public static final char[] toJsonCharArray(final Object obj) {
+		try (Node node = new Node(obj);) {
+			ObjectToJson(node, obj);
+			return node.sb.getArray();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -245,7 +259,7 @@ public final class MQToJson {
 					if (fos.isTransient()) continue;/*跳过transient属性*/
 					if (!isFirst || (isFirst = (!isFirst))) node.sb.append(Constants.JsonMark_2);
 					//if (count++ > 0) node.sb.append(Constants.JsonMark_2);
-					toJsonUserField(node, fos, UNSAFE.staticFieldBase(fos.getFieldsBase()));
+					toJsonUserField(node, fos, fos.getStaticFieldObject());
 				}
 			}
 			node.sb.append(Constants.JsonMark_11);

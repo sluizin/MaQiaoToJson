@@ -75,10 +75,12 @@ public final class MQBeanFieldsOffset {
 		int lenf = len - lenStates;
 		if (lenf > 0) e.fieldsOffsets = new FieldsOffset[lenf];
 		if (lenStates > 0) e.fieldsStaticOffsets = new FieldsOffset[lenStates];
-
 		for (int i = 0, fi = 0, si = 0; i < len; i++) {
 			final Field field = fields[i];
 			FieldsOffset f = new FieldsOffset();
+			//if(field.getName().equals("enumA"))
+				//System.out.println("--->enumA\t:"+field.isEnumConstant());
+			//System.out.println(field.getName()+"=\t:"+field.getType().getName()+"\tisEnumConstant()"+field.isEnumConstant());
 			f.fieldName = field.getName();
 			if (field.getType().isArray()) {/*判断是是数组*/
 				f.isArray = true;
@@ -89,18 +91,10 @@ public final class MQBeanFieldsOffset {
 				f.fTE = FieldTypeEnum.getByReflectFields(field.getType().getName());
 				if (f.fTE == null) insert(field.getType());
 			}/*判断是否是static属性以决定UNSAFE的调用方法得到偏移量*/
-			/*			
-			 if ((field.getModifiers() & java.lang.reflect.Modifier.STATIC) == java.lang.reflect.Modifier.STATIC) {
-							f.isStatic = true;
-							f.offSet = UNSAFE.staticFieldOffset(field);
-						} else {
-							f.offSet = UNSAFE.objectFieldOffset(field);
-						}
-			*/
 			if ((field.getModifiers() & java.lang.reflect.Modifier.TRANSIENT) == java.lang.reflect.Modifier.TRANSIENT) f.isTransient = true;
 			if ((field.getModifiers() & java.lang.reflect.Modifier.STATIC) == java.lang.reflect.Modifier.STATIC) {
-				//f.fieldsBase = field;
-				f.offSet = UNSAFE.staticFieldOffset(f.fieldsBase=field);
+				f.staticFieldObject = UNSAFE.staticFieldBase(field);
+				f.offSet = UNSAFE.staticFieldOffset(field);
 				e.fieldsStaticOffsets[si++] = f;
 			} else {
 				f.offSet = UNSAFE.objectFieldOffset(field);
@@ -109,6 +103,7 @@ public final class MQBeanFieldsOffset {
 			//f.offSet = (f.isStatic = ((field.getModifiers() & java.lang.reflect.Modifier.STATIC) == java.lang.reflect.Modifier.STATIC)) ? UNSAFE
 			//.staticFieldOffset(field) : UNSAFE.objectFieldOffset(field);
 		}
+		//System.out.println("------------------------------------------------");
 		/*排序 按偏移量进行排序*/
 		if (lenf > 1) e.fieldsOffsets = FieldsSort(e.fieldsOffsets);
 		if (lenStates > 1) e.fieldsStaticOffsets = FieldsSort(e.fieldsStaticOffsets);
@@ -207,7 +202,7 @@ public final class MQBeanFieldsOffset {
 
 	public final class FieldsOffset {
 		transient String fieldName = null;
-		transient Field fieldsBase = null;
+		transient Object staticFieldObject=null;
 		transient boolean isArray = false;
 		transient boolean isTransient = false;
 		transient FieldTypeEnum fTE = null;
@@ -217,9 +212,10 @@ public final class MQBeanFieldsOffset {
 			return fieldName;
 		}
 
-		public final Field getFieldsBase() {
-			return fieldsBase;
+		public final Object getStaticFieldObject() {
+			return staticFieldObject;
 		}
+
 		public final boolean isArray() {
 			return isArray;
 		}

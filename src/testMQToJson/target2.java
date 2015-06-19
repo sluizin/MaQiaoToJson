@@ -1,4 +1,4 @@
-
+package testMQToJson;
 
 import java.io.Serializable;
 

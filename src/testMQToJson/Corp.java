@@ -1,4 +1,4 @@
-
+package testMQToJson;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.BitSet;
 
-
 @SuppressWarnings("unused")
 public class Corp {
 	private static final long serialVersionUID = -5182532647273106745L;
+
 
 	private Long uid = 0L;
 //	private enum Action {
@@ -183,6 +183,7 @@ public class Corp {
 	public final String getCcddee() {
 		return ccddee;
 	}
+
 
 	public final String getCcddeeff() {
 		return ccddeeff;

@@ -184,10 +184,6 @@ public class Corp {
 		return ccddee;
 	}
 
-	public final void setCcddee(String ccddee) {
-		this.ccddee = ccddee;
-	}
-
 	public final String getCcddeeff() {
 		return ccddeeff;
 	}
